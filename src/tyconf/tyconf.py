@@ -99,7 +99,7 @@ class TyConf(Mapping):
     init_func: ClassVar[str] = "init"
     children: ClassVar[dict[str, type]] = {}
     _conf_keys: list[TyConfKey]
-    _conf_items: dict[str, Any]
+    _conf_items: dict[str, object]
 
     @classmethod
     def conf[F: Callable[..., Any]](cls,
@@ -132,9 +132,11 @@ class TyConf(Mapping):
             return target_cls
         return wrapper
 
-    def __init__(self, init_args={}):
+    def __init__(self, init_args={}, /, ignore_extra: bool | None = None):
         self._conf_keys = []
         self._conf_items = {}
+        if ignore_extra is not None:
+            self.ignore_extra = ignore_extra
         # call init func
         fn = getattr(self, self.init_func)
         fn()
@@ -183,7 +185,7 @@ class TyConf(Mapping):
                       required, help, metavar, deprecated)
         self._conf_keys.append(k)
 
-    def parse_dict(self, d: dict[str, Any]):
+    def parse_dict(self, d: dict[str, Any]) -> dict[str, object]:
         d_keys = set(d.keys())
         for key in self._conf_keys:
             self._set_value(key.name, self._check_key(key, d))
@@ -201,6 +203,7 @@ class TyConf(Mapping):
             else:
                 for key in d_keys:
                     self._set_value(key, d[key])
+        return self._dict()
 
     def parse_file(self, filename: str, format: str = ""):
         path = Path(filename)
@@ -229,6 +232,9 @@ class TyConf(Mapping):
 
     def _set_value(self, key: str, value: Any):
         self._conf_items[key] = value
+
+    def _dict(self) -> dict[str, object]:
+        return self._conf_items
 
     def _check_key(self, key: TyConfKey, d: dict[str, Any]) -> object:
         try:

@@ -75,6 +75,22 @@ class TestTyConf(unittest.TestCase):
                 continue
             self.assertEqual(v, d[k], f"invalid value of `{k}`")
         
+    def test_direct_use(self):
+        "Test using `TyConf` class directly"
+        conf = TyConf()
+        conf.add_key("int_item", int, default=0, help="the int value")
+        conf.add_key("str_item", str, example="hoge", help="the str value")
+        conf.add_key("list_of_str_item", list[str], example=["foo", "bar"],
+                     help="the list value")
+        d = {
+            "int_item": 1,
+            "str_item": "hoge",
+            "list_of_str_item": [ "foo", "bar", "baz" ]
+        }
+        result = conf.parse_dict(d)
+        for k in d:
+            self.assertEqual(result[k], d[k])
+
     def test_parse_valid_dict(self):
         "Check functionality for non-recursive dictionary"
         d = {
