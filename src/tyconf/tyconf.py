@@ -264,6 +264,9 @@ class TyConf(Mapping):
             dest_type = T.__name__
             msg = f"Failed to convert {value} ({key.name}) to {dest_type}: {e}"
             raise TyConfKeyError(msg)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} object: {str(self._dict())}"
         
 
 class TomlWriter:
