@@ -194,7 +194,13 @@ class TyConf(MutableMapping):
     def parse_dict(self, d: dict[str, Any]) -> dict[str, object]:
         d_keys = set(d.keys())
         for key in self._conf_keys:
-            self._set_value(key.name, self._check_key(key, d))
+            try:
+                v = self._check_key(key, d)
+            except KeyError:
+                # if key does not exists, ignore
+                # Note: if the key is required, self._check_key() raises `TyConfKeyError`.
+                continue
+            self._set_value(key.name, v)
             try:
                 d_keys.remove(key.name)
             except KeyError:
@@ -245,11 +251,11 @@ class TyConf(MutableMapping):
     def _check_key(self, key: TyConfKey, d: dict[str, Any]) -> object:
         try:
             val = d[key.name]
-        except KeyError:
+        except KeyError as err:
             if key.required:
                 msg = f"Required key `{key.name}` does not exist"
                 raise TyConfKeyError(msg)
-            return None
+            raise err
         if isinstance(key.type, GenericAlias):
             key_type: type = key.type.__origin__
         else:

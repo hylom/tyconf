@@ -127,11 +127,14 @@ class TestTyConf(unittest.TestCase):
         }
         conf = TyConfTest()
         conf.parse_dict(d)
+        self.assertEqual("str_item" in conf, True)
         conf["int_item"] = 2
         del conf["str_item"]
         self.assertEqual(2, conf.int_item)
         with self.assertRaises(AttributeError) as cm:
             conf.str_item
+        self.assertEqual("str_item" in conf, False)
+        self.assertEqual("foo" in conf, False)
 
     def test_undefined_key(self):
         "Check functionality when the dictionary has undefined keys"
@@ -158,6 +161,7 @@ class TestTyConf(unittest.TestCase):
         d = {}
         conf = TyConfNotRequiredTest()
         conf.parse_dict(d)
+        self.assertEqual("not_required_item" in conf, False)
 
     def test_ignore_extra_false(self):
         "Check functionality when the dictionary has undefined keys and ignore_extra is True"
