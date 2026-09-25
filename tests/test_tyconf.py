@@ -28,6 +28,14 @@ class TyConfRequiredTest(TyConf):
                      example="hoge", help="the str value")
 
 
+class TyConfNotRequiredTest(TyConf):
+    not_required_item: str
+
+    def init(self):
+        self.add_key("not_required_item", str,
+                     example="hoge", help="the str value")
+
+
 @TyConf.conf(ignore_extra=False)
 class TyConfTestExtra(TyConf):
     int_item: int
@@ -129,6 +137,12 @@ class TestTyConf(unittest.TestCase):
         conf = TyConfRequiredTest()
         with self.assertRaises(TyConfKeyError) as cm:
             conf.parse_dict(d)
+
+    def test_not_required_key(self):
+        "Check functionality of not-required key"
+        d = {}
+        conf = TyConfNotRequiredTest()
+        conf.parse_dict(d)
 
     def test_ignore_extra_false(self):
         "Check functionality when the dictionary has undefined keys and ignore_extra is True"
