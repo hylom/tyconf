@@ -258,11 +258,11 @@ class TyConf(Mapping):
             return T(value)
         except ValueError:
             dest_type = T.__name__
-            msg = f"Failed to convert {value} (key: {key.name}) to {dest_type}"
+            msg = f"Failed to parse {value} (key: {key.name}) as {dest_type}"
             raise TyConfKeyError(msg)
         except Exception as e:
             dest_type = T.__name__
-            msg = f"Failed to convert {value} (key: {key.name}) to {dest_type}: {e}"
+            msg = f"Failed to parse {value} (key: {key.name}) as {dest_type}: {e}"
             raise TyConfKeyError(msg)
 
     def __repr__(self):
