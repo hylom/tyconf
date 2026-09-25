@@ -241,7 +241,7 @@ class TyConf(Mapping):
             val = d[key.name]
         except KeyError:
             if key.required:
-                msg = f"key {key.name} does not exist"
+                msg = f"Required key `{key.name}` does not exist"
                 raise TyConfKeyError(msg)
             return None
         if isinstance(key.type, GenericAlias):

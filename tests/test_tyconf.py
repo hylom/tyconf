@@ -5,7 +5,7 @@ from typing import Any, Iterable
 
 sys.path.append(os.path.abspath("src"))
 from tyconf import TyConf
-from tyconf.tyconf import TomlWriter
+from tyconf.tyconf import TomlWriter, TyConfKeyError
 
 class TyConfTest(TyConf):
     int_item: int
@@ -19,6 +19,15 @@ class TyConfTest(TyConf):
                      help="the list value")
 
 
+class TyConfRequiredTest(TyConf):
+    required_item: str
+
+    def init(self):
+        self.add_key("required_item", str,
+                     required=True,
+                     example="hoge", help="the str value")
+
+
 @TyConf.conf(ignore_extra=False)
 class TyConfTestExtra(TyConf):
     int_item: int
@@ -30,7 +39,6 @@ class TyConfTestExtra(TyConf):
         self.add_key("str_item", str, example="hoge", help="the str value")
         self.add_key("list_of_str_item", list[str], example=["foo", "bar"],
                      help="the list value")
-
 
 class TyConfTestParent(TyConf):
     sub_conf: TyConfTest
@@ -114,6 +122,13 @@ class TestTyConf(unittest.TestCase):
         conf = TyConfTest()
         conf.parse_dict(d)
         self._check_conf_value(conf, d, ignores=("other1", "other2"))
+
+    def test_required_key(self):
+        "Check functionality of required key"
+        d = {}
+        conf = TyConfRequiredTest()
+        with self.assertRaises(TyConfKeyError) as cm:
+            conf.parse_dict(d)
 
     def test_ignore_extra_false(self):
         "Check functionality when the dictionary has undefined keys and ignore_extra is True"
