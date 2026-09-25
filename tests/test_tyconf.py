@@ -118,6 +118,21 @@ class TestTyConf(unittest.TestCase):
         conf.parse_dict(d)
         self._check_conf_value(conf, d)
 
+    def test_mutable_mapping(self):
+        "Check functionality of TyConf as MutableMapping"
+        d = {
+            "int_item": 1,
+            "str_item": "hoge",
+            "list_of_str_item": [ "foo", "bar", "baz" ]
+        }
+        conf = TyConfTest()
+        conf.parse_dict(d)
+        conf["int_item"] = 2
+        del conf["str_item"]
+        self.assertEqual(2, conf.int_item)
+        with self.assertRaises(AttributeError) as cm:
+            conf.str_item
+
     def test_undefined_key(self):
         "Check functionality when the dictionary has undefined keys"
         d = {

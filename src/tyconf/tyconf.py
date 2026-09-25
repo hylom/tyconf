@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime, date, time
 import json
 import tomllib
-from collections.abc import Mapping, Iterator
+from collections.abc import MutableMapping, Iterator
 
 
 import logging
@@ -93,7 +93,7 @@ class TyConfKey[T]:
                 t.append(f"""Default: {self.default}""")
         return "".join(t)
 
-class TyConf(Mapping):
+class TyConf(MutableMapping):
     """Typed configuration parser inspired from `argparse`"""
     ignore_extra: ClassVar[bool] = True
     init_func: ClassVar[str] = "init"
@@ -162,6 +162,12 @@ class TyConf(Mapping):
 
     def __getitem__(self, key: str) -> Any:
         return self._conf_items[key]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self._conf_items[key] = value
+
+    def __delitem__(self, key: str) -> None:
+        del self._conf_items[key]
 
     def __iter__(self) -> Iterator[Any]:
         return iter(self._conf_items)
